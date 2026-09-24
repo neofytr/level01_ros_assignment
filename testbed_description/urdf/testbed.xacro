@@ -2,7 +2,6 @@
 <robot name="testbed" xmlns:xacro="http://www.ros.org/wiki/xacro">
 
 <xacro:include filename="$(find testbed_description)/urdf/materials.xacro" />
-<xacro:include filename="$(find testbed_description)/urdf/testbed.trans" />
 <xacro:include filename="$(find testbed_description)/urdf/testbed.gazebo" />
 
 
@@ -169,14 +168,14 @@
     <inertia ixx="1e-06" iyy="1e-06" izz="2e-06" ixy="0.0" iyz="-0.0" ixz="-0.0"/>
   </inertial>
   <visual>
-    <origin xyz="0.1 -0.05 -0.1612" rpy="0 0 0"/>
+    <origin xyz="0.0957 0.1238 -0.1595" rpy="0 0 0"/>
     <geometry>
       <mesh filename="file://$(find testbed_description)/meshes/imu_link_1.stl" scale="0.001 0.001 0.001"/>
     </geometry>
     <material name="silver"/>
   </visual>
   <collision>
-    <origin xyz="0.1 -0.05 -0.1612" rpy="0 0 0"/>
+    <origin xyz="0.0957 0.1238 -0.1595" rpy="0 0 0"/>
     <geometry>
       <mesh filename="file://$(find testbed_description)/meshes/imu_link_1.stl" scale="0.001 0.001 0.001"/>
     </geometry>
@@ -190,14 +189,14 @@
     <inertia ixx="1e-06" iyy="1e-06" izz="2e-06" ixy="-0.0" iyz="0.0" ixz="0.0"/>
   </inertial>
   <visual>
-    <origin xyz="0.1 0.14 -0.1612" rpy="0 0 0"/>
+    <origin xyz="0.0957 -0.0462 -0.1595" rpy="0 0 0"/>
     <geometry>
       <mesh filename="file://$(find testbed_description)/meshes/dummy_link_1.stl" scale="0.001 0.001 0.001"/>
     </geometry>
     <material name="silver"/>
   </visual>
   <collision>
-    <origin xyz="0.1 0.14 -0.1612" rpy="0 0 0"/>
+    <origin xyz="0.0957 -0.0462 -0.1595" rpy="0 0 0"/>
     <geometry>
       <mesh filename="file://$(find testbed_description)/meshes/dummy_link_1.stl" scale="0.001 0.001 0.001"/>
     </geometry>
@@ -228,7 +227,7 @@
 <joint name="fixed_base_joint" type="fixed">
   <parent link="base_footprint" />
   <child link="base_link" />
-  <origin xyz="0 0 0" rpy="0 0 0" />
+  <origin xyz="0.0507 0.0379 0" rpy="0 0 0" />
 </joint>
 
 <joint name="left_wheel_joint" type="continuous">
@@ -269,13 +268,13 @@
 </joint>
 
 <joint name="imu_joint" type="fixed">
-  <origin xyz="-0.1 0.05 0.163" rpy="0 0 0"/>
+  <origin xyz="-0.0957 -0.1238 0.1595" rpy="0 0 0"/>
   <parent link="base_link"/>
   <child link="imu_link_1"/>
 </joint>
 
 <joint name="dummy_joint" type="fixed">
-  <origin xyz="-0.1 -0.1315 0.163" rpy="0 0 0"/>
+  <origin xyz="-0.0957 0.0462 0.1595" rpy="0 0 0"/>
   <parent link="base_link"/>
   <child link="dummy_link_1"/>
 </joint>
