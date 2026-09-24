@@ -24,6 +24,7 @@ def generate_launch_description():
         IncludeLaunchDescription(
             PythonLaunchDescriptionSource(os.path.join(pkg, 'launch', 'map_loader.launch.py')),
             launch_arguments={'map': LaunchConfiguration('map'),
+                              'map_params_file': os.path.join(pkg, 'config', 'map_server_params.yaml'),
                               'use_sim_time': use_sim_time,
                               'autostart': autostart}.items(),
         ),

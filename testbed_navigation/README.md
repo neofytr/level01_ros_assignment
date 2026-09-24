@@ -26,7 +26,7 @@ AMCL starts at the spawn pose, so you can send a Nav2 Goal from RViz right away.
 
 ```
 launch/   map_loader, localization, navigation, bringup
-config/   amcl_params.yaml, nav2_params.yaml
+config/   map_server_params.yaml, amcl_params.yaml, nav2_params.yaml
 rviz/     navigation.rviz
 media/    screenshots
 test/     static and runtime tests
@@ -42,12 +42,14 @@ Each stage has its own lifecycle manager, so it can run without the others. `loc
 | planner | NavFn |
 | controller | DWB |
 | costmaps | static, obstacle, inflation |
-| behaviors, BT | nav2 defaults |
+| behaviors | spin, backup, drive_on_heading, wait |
+| BT | stock Humble plugin list, default navigate-to-pose tree |
 | extra | velocity smoother between the controller and the base |
 
-I started from the nav2_bringup params and cut them down to what differs from the defaults. To
-check, I dumped the parameters each node actually runs with and compared that against a run without
-my params. What's left:
+Every plugin is declared by name in `nav2_params.yaml`. The BT plugin list is the stock Humble one,
+so it also loads on older Humble installs. Beyond that I only set values that differ from nav2's
+defaults, and checked by dumping the parameters each node actually runs with. The ones that matter
+for this robot:
 
 - `robot_base_frame: base_footprint` for the costmaps, BT navigator and behavior server, which
   default to `base_link`. AMCL already defaults to `base_footprint`.
