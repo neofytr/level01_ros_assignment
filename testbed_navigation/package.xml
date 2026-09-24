@@ -1,0 +1,40 @@
+<?xml version="1.0"?>
+<?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
+<package format="3">
+  <name>testbed_navigation</name>
+  <version>1.0.0</version>
+  <description>Nav2 setup for the Testbed-T1.0.0.</description>
+  <maintainer email="imagination12344321.com@gmail.com">neofytr</maintainer>
+  <license>Apache-2.0</license>
+
+  <buildtool_depend>ament_cmake</buildtool_depend>
+
+  <exec_depend>nav2_map_server</exec_depend>
+  <exec_depend>nav2_amcl</exec_depend>
+  <exec_depend>nav2_lifecycle_manager</exec_depend>
+  <exec_depend>nav2_planner</exec_depend>
+  <exec_depend>nav2_controller</exec_depend>
+  <exec_depend>nav2_behaviors</exec_depend>
+  <exec_depend>nav2_bt_navigator</exec_depend>
+  <exec_depend>nav2_velocity_smoother</exec_depend>
+  <exec_depend>nav2_navfn_planner</exec_depend>
+  <exec_depend>dwb_core</exec_depend>
+  <exec_depend>nav2_costmap_2d</exec_depend>
+  <exec_depend>testbed_bringup</exec_depend>
+  <exec_depend>testbed_description</exec_depend>
+  <exec_depend>testbed_gazebo</exec_depend>
+  <exec_depend>rviz2</exec_depend>
+
+  <test_depend>ament_cmake_pytest</test_depend>
+  <test_depend>python3-pytest</test_depend>
+  <test_depend>python3-yaml</test_depend>
+  <test_depend>launch</test_depend>
+  <test_depend>rclpy</test_depend>
+  <test_depend>geometry_msgs</test_depend>
+  <test_depend>nav2_msgs</test_depend>
+  <test_depend>gazebo_msgs</test_depend>
+
+  <export>
+    <build_type>ament_cmake</build_type>
+  </export>
+</package>
