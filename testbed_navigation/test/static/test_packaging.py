@@ -40,7 +40,8 @@ def test_launched_packages_are_declared(package):
     for path in (REPO / package / 'launch').glob('*.launch.py'):
         text = path.read_text()
         used |= set(re.findall(r"package\s*=\s*['\"](\w+)", text))
-        used |= set(re.findall(r"(?:get_package_share_directory|FindPackageShare)\(\s*['\"](\w+)", text))
+        used |= set(re.findall(
+            r"(?:get_package_share_directory|FindPackageShare)\(\s*['\"](\w+)", text))
     assert used <= declared, used - declared
 
 

@@ -49,7 +49,26 @@ def test_navigation_config_matches_the_robot():
     local = nav['local_costmap']['local_costmap']['ros__parameters']
     frame = DRIVE.findtext('robot_base_frame')
     assert frame == 'base_footprint'
-    assert frame == local['robot_base_frame'] == nav['bt_navigator']['ros__parameters']['robot_base_frame']
+    assert frame == local['robot_base_frame']
+    assert frame == nav['bt_navigator']['ros__parameters']['robot_base_frame']
     assert local['global_frame'] == DRIVE.findtext('odometry_frame')
     assert LIDAR.findtext('plugin/ros/remapping') == '~/out:=scan'
     assert local['obstacle_layer']['scan']['topic'] == '/scan'
+
+
+def test_amcl_matches_the_lidar_and_frames():
+    amcl = yaml.safe_load((CONFIG / 'amcl_params.yaml').read_text())['amcl']['ros__parameters']
+    assert amcl['base_frame_id'] == DRIVE.findtext('robot_base_frame')
+    assert amcl['odom_frame_id'] == DRIVE.findtext('odometry_frame')
+    assert amcl['scan_topic'] == 'scan'
+    assert amcl['laser_min_range'] == float(LIDAR.findtext('ray/range/min'))
+    assert amcl['laser_max_range'] == float(LIDAR.findtext('ray/range/max'))
+
+
+def test_smoother_limits_match_the_controller():
+    nav = yaml.safe_load((CONFIG / 'nav2_params.yaml').read_text())
+    dwb = nav['controller_server']['ros__parameters']['FollowPath']
+    smoother = nav['velocity_smoother']['ros__parameters']
+    assert smoother['max_velocity'] == [dwb['max_vel_x'], 0.0, dwb['max_vel_theta']]
+    assert smoother['max_accel'] == [dwb['acc_lim_x'], 0.0, dwb['acc_lim_theta']]
+    assert smoother['max_decel'] == [dwb['decel_lim_x'], 0.0, dwb['decel_lim_theta']]

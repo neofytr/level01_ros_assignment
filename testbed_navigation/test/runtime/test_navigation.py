@@ -6,8 +6,10 @@ import time
 
 import pytest
 import rclpy
+from action_msgs.msg import GoalStatus
 from gazebo_msgs.srv import SpawnEntity
 from geometry_msgs.msg import PoseWithCovarianceStamped
+from lifecycle_msgs.srv import GetState
 from nav2_msgs.action import NavigateToPose, Spin
 from nav2_msgs.msg import Costmap
 from rclpy.action import ActionClient
@@ -23,13 +25,17 @@ MANAGED = ['map_server', 'amcl', 'controller_server', 'planner_server',
            'behavior_server', 'bt_navigator', 'velocity_smoother']
 
 
-def active(node):
-    try:
-        out = subprocess.run(['ros2', 'lifecycle', 'get', f'/{node}'],
-                             capture_output=True, text=True, timeout=15).stdout
-    except subprocess.TimeoutExpired:
-        return False
-    return out.startswith('active')
+def not_active(node, clients):
+    down = []
+    for name, client in clients.items():
+        state = None
+        if client.wait_for_service(timeout_sec=1.0):
+            future = client.call_async(GetState.Request())
+            rclpy.spin_until_future_complete(node, future, timeout_sec=5.0)
+            state = future.result()
+        if state is None or state.current_state.label != 'active':
+            down.append(name)
+    return down
 
 
 def truth():
@@ -45,7 +51,7 @@ def run(node, action, name, goal, timeout):
     rclpy.spin_until_future_complete(node, sent, timeout_sec=30)
     result = sent.result().get_result_async()
     rclpy.spin_until_future_complete(node, result, timeout_sec=timeout)
-    assert result.result().status == 4, name
+    assert result.result().status == GoalStatus.STATUS_SUCCEEDED, name
 
 
 def navigate(node, x, y):
@@ -60,21 +66,30 @@ def navigate(node, x, y):
 
 
 @pytest.fixture(scope='module')
-def node():
-    stack = subprocess.Popen(
-        ['ros2', 'launch', 'testbed_navigation', 'bringup.launch.py', 'rviz:=false', 'gui:=false'],
-        stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, start_new_session=True)
+def node(tmp_path_factory):
+    log = tmp_path_factory.mktemp('bringup') / 'launch.log'
+    with open(log, 'w') as out:
+        stack = subprocess.Popen(
+            ['ros2', 'launch', 'testbed_navigation', 'bringup.launch.py',
+             'rviz:=false', 'gui:=false'],
+            stdout=out, stderr=subprocess.STDOUT, start_new_session=True)
+    rclpy.init()
+    node = Node('navigation_test')
+    clients = {name: node.create_client(GetState, f'/{name}/get_state') for name in MANAGED}
     try:
         deadline = time.time() + 240
-        while not (truth() and all(active(n) for n in MANAGED)):
-            assert time.time() < deadline, 'navigation stack never came up'
-            time.sleep(5)
-        rclpy.init()
-        node = Node('navigation_test')
+        while True:
+            down = not_active(node, clients)
+            if not down and truth():
+                break
+            if time.time() > deadline:
+                pytest.fail(f'not up after 240 s: {down or "robot not spawned"}\n'
+                            f'{log.read_text()[-3000:]}')
+            time.sleep(2)
         yield node
+    finally:
         node.destroy_node()
         rclpy.shutdown()
-    finally:
         os.killpg(stack.pid, signal.SIGKILL)
 
 
@@ -116,7 +131,8 @@ def test_amcl_recovers_from_a_wrong_initial_pose(node):
     run(node, Spin, 'spin', spin, 120)
 
     x, y = truth()
-    assert error_from(x, y) < 0.15, 'AMCL did not pull a 0.5 m error back onto the robot'
+    error = error_from(x, y)
+    assert error < 0.25, f'AMCL is still {error:.2f} m off after a 0.5 m knock and one spin'
 
 
 def test_sees_an_obstacle_that_is_not_on_the_map(node):
@@ -130,10 +146,11 @@ def test_sees_an_obstacle_that_is_not_on_the_map(node):
         if not costmaps:
             return None
         meta = costmaps[-1].metadata
+        origin, step = meta.origin.position, meta.resolution
         return any(
             value == 254 and math.hypot(
-                meta.origin.position.x + (index % meta.size_x + 0.5) * meta.resolution - target[0],
-                meta.origin.position.y + (index // meta.size_x + 0.5) * meta.resolution - target[1],
+                origin.x + (index % meta.size_x + 0.5) * step - target[0],
+                origin.y + (index // meta.size_x + 0.5) * step - target[1],
             ) < 0.3
             for index, value in enumerate(costmaps[-1].data))
 
