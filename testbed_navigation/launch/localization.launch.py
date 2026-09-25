@@ -10,6 +10,7 @@ from launch_ros.actions import Node
 
 def generate_launch_description():
     pkg = get_package_share_directory('testbed_navigation')
+    map_params = os.path.join(pkg, 'config', 'map_server_params.yaml')
     use_sim_time = LaunchConfiguration('use_sim_time')
     autostart = LaunchConfiguration('autostart')
     default_map = os.path.join(
@@ -24,7 +25,7 @@ def generate_launch_description():
         IncludeLaunchDescription(
             PythonLaunchDescriptionSource(os.path.join(pkg, 'launch', 'map_loader.launch.py')),
             launch_arguments={'map': LaunchConfiguration('map'),
-                              'map_params_file': os.path.join(pkg, 'config', 'map_server_params.yaml'),
+                              'map_params_file': map_params,
                               'use_sim_time': use_sim_time,
                               'autostart': autostart}.items(),
         ),
@@ -33,7 +34,7 @@ def generate_launch_description():
             executable='amcl',
             name='amcl',
             output='screen',
-            parameters=[LaunchConfiguration('params_file')],
+            parameters=[LaunchConfiguration('params_file'), {'use_sim_time': use_sim_time}],
         ),
         Node(
             package='nav2_lifecycle_manager',

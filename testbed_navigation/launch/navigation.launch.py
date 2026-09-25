@@ -19,10 +19,11 @@ SERVERS = [
 def generate_launch_description():
     pkg = get_package_share_directory('testbed_navigation')
     params = LaunchConfiguration('params_file')
+    use_sim_time = LaunchConfiguration('use_sim_time')
 
     servers = [
-        Node(package=package, executable=executable, name=executable,
-             output='screen', parameters=[params], remappings=remappings)
+        Node(package=package, executable=executable, name=executable, output='screen',
+             parameters=[params, {'use_sim_time': use_sim_time}], remappings=remappings)
         for package, executable, remappings in SERVERS
     ]
 
@@ -32,7 +33,7 @@ def generate_launch_description():
         name='lifecycle_manager_navigation',
         output='screen',
         parameters=[{
-            'use_sim_time': LaunchConfiguration('use_sim_time'),
+            'use_sim_time': use_sim_time,
             'autostart': LaunchConfiguration('autostart'),
             'node_names': [executable for _, executable, _ in SERVERS],
         }],

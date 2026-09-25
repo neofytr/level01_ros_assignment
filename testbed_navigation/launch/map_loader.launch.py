@@ -25,7 +25,8 @@ def generate_launch_description():
             name='map_server',
             output='screen',
             parameters=[LaunchConfiguration('map_params_file'),
-                        {'yaml_filename': LaunchConfiguration('map')}],
+                        {'use_sim_time': use_sim_time,
+                         'yaml_filename': LaunchConfiguration('map')}],
         ),
         Node(
             package='nav2_lifecycle_manager',
