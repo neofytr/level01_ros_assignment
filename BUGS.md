@@ -36,8 +36,8 @@ The diff drive plugin uses 0.35 m. Working it out from the wheel meshes and join
 0.376 m, with the wheel centres at y = +0.150 and y = -0.226 in `base_link`.
 
 It doesn't show up in odometry, because this plugin publishes the true pose. It shows up in the
-turn rate: commanding 0.6 rad/s gave 0.573 rad/s before the fix and 0.616 rad/s after. The ratio,
-0.930, matches 0.35 / 0.376. Linear speed isn't affected.
+turn rate. Commanding 0.6 rad/s for 12 s gave a steady 0.549 rad/s before the fix and 0.590 rad/s
+after. The ratio, 0.931, matches 0.35 / 0.376. Linear speed isn't affected.
 
 Fix: `0.376`. The wheel diameter, 0.1 m, was already right.
 
@@ -47,7 +47,7 @@ The chassis and the drive axis are both centred at (-0.051, -0.038) in `base_lin
 `fixed_base_joint` is `0 0 0`. So `base_footprint`, which odometry and the costmaps use, sits 63 mm
 from the point the robot turns about. Spinning in place swings it around a 63 mm radius.
 
-Fix: `fixed_base_joint` origin set to `0.0507 0.0379 0`. The same spin now moves it 3 mm. This is
+Fix: `fixed_base_joint` origin set to `0.0507 0.0379 0`. The same spin now moves it 2 mm. This is
 also why `robot_radius` is 0.25 m; with the old frame it would have to be 0.32 m.
 
 ## 7. IMU and dummy frames swapped
@@ -104,4 +104,4 @@ Fix: removed.
 - The map origin, `[-10.2, -9.94]`. I rasterized the world's collision geometry at lidar height and
   matched it against the map. The best fit is within one pixel of zero offset.
 - The four casters are fixed joints, so they drag instead of rolling. The robot still tracks commands
-  (0.20 m/s commanded, 0.200 m/s measured), so I left them and kept the acceleration limits low.
+  (0.20 m/s commanded, 0.200 m/s measured), so I left them as they are.
