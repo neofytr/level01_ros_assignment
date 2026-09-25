@@ -20,6 +20,14 @@ ros2 launch testbed_navigation navigation.launch.py          # planner, controll
 `localization` starts the map server itself. To check just the map in RViz, run
 `map_loader.launch.py` instead of it, not as well, or you get two map servers.
 
+The simulation's own RViz uses `odom` as the fixed frame and doesn't show the map. For the map,
+costmaps and plan, open this package's view:
+
+```bash
+rviz2 -d $(ros2 pkg prefix testbed_navigation)/share/testbed_navigation/rviz/navigation.rviz \
+  --ros-args -p use_sim_time:=true
+```
+
 Or everything, with RViz:
 
 ```bash
