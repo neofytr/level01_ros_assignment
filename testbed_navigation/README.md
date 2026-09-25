@@ -9,15 +9,16 @@ map loading, AMCL recovering from a wrong pose, and a goal in the next room.
 
 ## Run
 
-```bash
-# simulation
-ros2 launch testbed_bringup testbed_full_bringup.launch.py
+Each in its own terminal:
 
-# each stage on its own
-ros2 launch testbed_navigation map_loader.launch.py
-ros2 launch testbed_navigation localization.launch.py   # includes map_loader
-ros2 launch testbed_navigation navigation.launch.py
+```bash
+ros2 launch testbed_bringup testbed_full_bringup.launch.py   # simulation
+ros2 launch testbed_navigation localization.launch.py        # map server + AMCL
+ros2 launch testbed_navigation navigation.launch.py          # planner, controller, BT
 ```
+
+`localization` starts the map server itself. To check just the map in RViz, run
+`map_loader.launch.py` instead of it, not as well, or you get two map servers.
 
 Or everything, with RViz:
 
